@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Modal from 'react-modal';
 import DateTimePicker from 'react-datetime-picker';
 import moment from 'moment'
+import { Swal } from "sweetalert2";
 Modal.setAppElement('#root')
 
 const customStyles = {
@@ -22,6 +23,7 @@ export const CalendarModal = () => {
 
     const [dateStart, setDateStart] = useState(now.toDate());
     const [dateEnd, setDateEnd] = useState(later.toDate());
+    const [titleValid, setTitleValid] = useState(true)
 
     const [formValues, setFormValues] = useState({
         title:'Evento',
@@ -31,7 +33,7 @@ export const CalendarModal = () => {
     })
 
 
-    const {notes, title} = formValues;
+    const {notes, title, start, end} = formValues;
 
 
     const handleInputChange =({target})=>{
@@ -64,7 +66,20 @@ export const CalendarModal = () => {
 
     const handleSubmit=(e)=>{
         e.preventDefault();
-        console.log(formValues);
+
+        const momentStart = moment(start);
+        const momentEnd = moment(end);
+
+        if (momentStart.isSameOrAfter(momentEnd)) {
+            return Swal.fire('Error', 'La fecha de fin debe ser mayor a la fecha de inicio', 'error')
+        }
+
+        if (title.trim().length < 2) {
+            return setTitleValid(false)
+        }
+
+        setTitleValid(true);
+        closeModal();
     }
     return (
         <Modal
@@ -105,7 +120,7 @@ export const CalendarModal = () => {
                     <label>Titulo y notas</label>
                     <input
                         type="text"
-                        className="form-control"
+                        className={`form-control ${!titleValid && 'is-invalid'}`}
                         placeholder="Título del evento"
                         name="title"
                         autoComplete="off"
