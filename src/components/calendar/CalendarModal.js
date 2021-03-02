@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Modal from 'react-modal';
 import DateTimePicker from 'react-datetime-picker';
 import moment from 'moment'
 import { Swal } from "sweetalert2";
 import { useDispatch, useSelector } from 'react-redux';
 import { uiCloseModal } from '../../actions/ui';
+import { eventAddNew, eventClearActiveEvent } from '../../actions/events';
 Modal.setAppElement('#root')
 
 const customStyles = {
@@ -20,27 +21,32 @@ const customStyles = {
 
 const now = moment().minutes(0).seconds(0).add(1,'hours');
 const later = moment().minutes(0).seconds(0).add(2,'hours');
+const initEvent={
+    title:'',
+    notes:'',
+    start:now.toDate(),
+    end: later.toDate()
+}
 
 export const CalendarModal = () => {
 
     const dispatch = useDispatch()
 
     const {modalOpen} = useSelector(state => state.ui)
+    const {activeEvent} = useSelector(state => state.calendar)
 
     const [dateStart, setDateStart] = useState(now.toDate());
     const [dateEnd, setDateEnd] = useState(later.toDate());
     const [titleValid, setTitleValid] = useState(true)
 
-    const [formValues, setFormValues] = useState({
-        title:'Evento',
-        notes:'',
-        start:now.toDate(),
-        end:later.toDate()
-    })
-
-
+    const [formValues, setFormValues] = useState(initEvent)
     const {notes, title, start, end} = formValues;
 
+    useEffect(() => {
+        if (activeEvent) {
+            setFormValues(activeEvent)
+        }
+    }, [activeEvent, setFormValues])
 
     const handleInputChange =({target})=>{
         setFormValues({
@@ -51,6 +57,8 @@ export const CalendarModal = () => {
 
     const closeModal = () => {
         dispatch(uiCloseModal());
+        dispatch(eventClearActiveEvent());
+        setFormValues(initEvent);
     }
 
 
@@ -83,7 +91,14 @@ export const CalendarModal = () => {
         if (title.trim().length < 2) {
             return setTitleValid(false)
         }
-
+        dispatch(eventAddNew({
+            ...formValues,
+            id: new Date().getTime(),
+            user:{
+                _id:'123123',
+                name:"Esnedier"
+            }
+        }))
         setTitleValid(true);
         closeModal();
     }

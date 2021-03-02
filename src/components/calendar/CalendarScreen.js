@@ -9,7 +9,7 @@ import { CalendarEvent } from './CalendarEvent'
 import { CalendarModal } from './CalendarModal'
 import { uiOpenModal } from '../../actions/ui'
 import { eventSetActive } from '../../actions/events'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { AddNewFab } from '../ui/AddNewFab'
 
 
@@ -23,17 +23,8 @@ export const CalendarScreen = () => {
     
     moment.locale('es')
     const localizer = momentLocalizer(moment)
-    const events = [{
-        title: "tamo activo papu",
-        start: moment().toDate(),
-        end: moment().add(2, 'hours').toDate(),
-        bgcolor: '#fafafa',
-        notes:'comprar pastel',
-        user:{
-            uid:123,
-            name:'jaunito'
-        }
-    }]
+
+    const {events} = useSelector(state => state.calendar)
     
     const [lastView, setLastView] = useState(localStorage.getItem('lastView')||'month')
     
@@ -42,7 +33,6 @@ export const CalendarScreen = () => {
     }
     const onSelectEvent=(e)=>{
         dispatch(eventSetActive(e));
-        dispatch(uiOpenModal());
     }
     const onViewChange=(e)=>{
         setLastView(e)
