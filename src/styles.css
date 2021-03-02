@@ -8,7 +8,9 @@ html, body{
     flex-flow: column;
     height: 100vh;
 }
-
+.rbc-time-view{
+    height: 80vh;
+}
 .rbc-calendar{
     height: 100%;
 }
